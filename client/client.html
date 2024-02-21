@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SSE Example</title>
+    <style>
+      /* 테이블 기본 스타일 */
+      .table {
+        width: 100%; /* 테이블의 너비를 페이지에 맞춤 */
+        border-collapse: collapse; /* 테이블 사이의 간격 없애기 */
+        font-family: Arial, sans-serif; /* 폰트 스타일 */
+      }
+
+      /* 테이블 헤더 스타일 */
+      .table th {
+        background-color: #4caf50; /* 헤더 배경 색 */
+        color: white; /* 헤더 텍스트 색 */
+        text-align: left; /* 텍스트 정렬 */
+        padding: 12px; /* 패딩 */
+      }
+
+      /* 테이블 바디 셀 스타일 */
+      .table td {
+        border: 1px solid #ddd; /* 셀 테두리 스타일 */
+        padding: 8px; /* 셀 내부 패딩 */
+      }
+
+      /* 행 호버 스타일 */
+      .table tr:hover {
+        background-color: #ddd;
+      }
+
+      /* 반응형 디자인을 위한 미디어 쿼리 */
+      @media screen and (max-width: 600px) {
+        .table th,
+        .table td {
+          display: block;
+          width: 100%;
+        }
+      }
+
+      .error {
+        color: red;
+      }
+      .open {
+        color: blue;
+      }
+      .message {
+        color: green;
+      }
+      .split-container {
+        padding: 0 10px;
+        display: flex;
+        gap: 10px;
+      }
+      .split {
+        flex: 1;
+      }
+      .form {
+        text-align: center;
+        margin: 0 0 10px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <button class="all-submit">동시 접속</button>
+    <div class="split-container">
+      
+      <div class="split">
+        <form class="form">
+          <label>
+            사용자 ::
+            <input name="user" type="text" value="Alpha User" />
+          </label>
+          <input type="submit" value="접속" />
+        </form>
+
+        <table class="table">
+          <caption>
+            EventStream
+          </caption>
+          <tr>
+            <th>No</th>
+            <th>lastEventId</th>
+            <th>type</th>
+            <th>data</th>
+          </tr>
+        </table>
+      </div>
+      <div class="split">
+        <form class="form">
+          <label>
+            사용자 ::
+            <input name="user" type="text" value="Beta User" />
+          </label>
+          <input type="submit" value="접속" />
+        </form>
+
+        <table class="table">
+          <caption>
+            EventStream
+          </caption>
+          <tr>
+            <th>No</th>
+            <th>lastEventId</th>
+            <th>type</th>
+            <th>data</th>
+          </tr>
+        </table>
+      </div>
+      <div class="split">
+        <form class="form">
+          <label>
+            사용자 ::
+            <input name="user" type="text" value="Theta User" />
+          </label>
+          <input type="submit" value="접속" />
+        </form>
+
+        <table class="table">
+          <caption>
+            EventStream
+          </caption>
+          <tr>
+            <th>No</th>
+            <th>lastEventId</th>
+            <th>type</th>
+            <th>data</th>
+          </tr>
+        </table>
+      </div>
+
+    </div>
+
+    <script>
+      const forms = document.querySelectorAll('.form')
+      forms.forEach((form, idx) => {
+        form.addEventListener('submit', (event) => {
+          event.preventDefault()
+          const user = event.target['user'].value
+          client(user, idx)
+        })
+      })
+      document.querySelector('.all-submit').addEventListener('click', event => {
+        const submitBtns = document.querySelectorAll('input[type="submit"]')
+        submitBtns.forEach(btn => btn.click())
+      })
+
+      const client = (user, idx) => {
+        let number = 1
+        let eventSource = new EventSource('http://localhost:8080/stream-sse?user=' + user)
+        const sseDataElement = document.querySelectorAll('.table')
+        function scrollToBottom() {
+          window.scrollTo(0, document.body.scrollHeight)
+        }
+        function addTableRow(event) {
+          const trEl = document.createElement('tr')
+          trEl.innerHTML = `
+            <tr>
+              <td>${number++}</td>
+              <td>${event.lastEventId}</td>
+              <td class="${event.type}">${event.type}</td>
+              <td> ${event.data} </td>
+            </tr>
+            `
+          sseDataElement[idx].append(trEl)
+          scrollToBottom(document.body)
+        }
+eventSource.addEventListener
+        eventSource.onerror = (event) => {
+          addTableRow(event)
+        }
+        eventSource.onmessage = function (event) {
+          addTableRow(event)
+        }
+        eventSource.onopen = (event) => {
+          addTableRow(event)
+        }
+      }
+    </script>
+  </body>
+</html>
